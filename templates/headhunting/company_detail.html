@@ -1,0 +1,102 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ company.name }} - 公司详情 - 猎头管理系统{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>公司详情</h2>
+        <div>
+            <a href="{% url 'company_update' company.id %}" class="btn btn-primary me-2">
+                <i class="bi bi-pencil"></i> 编辑公司
+            </a>
+            <a href="{% url 'company_delete' company.id %}" class="btn btn-danger">
+                <i class="bi bi-trash"></i> 删除公司
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">{{ company.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">公司地址：</div>
+                        <div class="col-md-9">{{ company.address|default:"未填写" }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">联系人：</div>
+                        <div class="col-md-9">{{ company.contact_person|default:"未填写" }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">联系电话：</div>
+                        <div class="col-md-9">{{ company.contact_phone|default:"未填写" }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">联系邮箱：</div>
+                        <div class="col-md-9">{{ company.contact_email|default:"未填写" }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">创建时间：</div>
+                        <div class="col-md-9">{{ company.created_at|date:"Y-m-d H:i" }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">创建人：</div>
+                        <div class="col-md-9">{{ company.created_by }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 fw-bold">公司描述：</div>
+                        <div class="col-md-9">{{ company.description|default:"暂无描述"|linebreaks }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">相关项目</h5>
+                        <a href="{% url 'project_create' %}" class="btn btn-sm btn-light">
+                            <i class="bi bi-plus-circle"></i> 新建项目
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if company.projects.all %}
+                    <div class="list-group">
+                        {% for project in company.projects.all %}
+                        <a href="{% url 'project_detail' project.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ project.title }}</h6>
+                                <small>{{ project.created_at|date:"Y-m-d" }}</small>
+                            </div>
+                            <p class="mb-1">{{ project.job_title }}</p>
+                            <small>状态: {{ project.status.name }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 该公司暂无相关项目，请点击"新建项目"按钮创建。
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <a href="{% url 'company_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> 返回列表
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock %} 

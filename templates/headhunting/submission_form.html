@@ -1,0 +1,151 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{% if object %}编辑投递{% else %}创建投递{% endif %} - 猎头管理系统{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">{% if object %}编辑投递{% else %}创建投递{% endif %}</h5>
+                </div>
+                <div class="card-body">
+                    {% if project %}
+                    <div class="alert alert-info mb-4">
+                        <h6 class="alert-heading">项目信息</h6>
+                        <p class="mb-1"><strong>项目：</strong> {{ project.title }}</p>
+                        <p class="mb-1"><strong>公司：</strong> {{ project.company.name }}</p>
+                        <p class="mb-0"><strong>职位：</strong> {{ project.job_title }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if resume %}
+                    <div class="alert alert-info mb-4">
+                        <h6 class="alert-heading">简历信息</h6>
+                        <p class="mb-1"><strong>姓名：</strong> {{ resume.name }}</p>
+                        <p class="mb-1"><strong>电话：</strong> {{ resume.phone }}</p>
+                        <p class="mb-0"><strong>电子邮件：</strong> {{ resume.email }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if not project %}
+                        <div class="mb-3">
+                            <label for="{{ form.project.id_for_label }}" class="form-label">项目</label>
+                            {{ form.project }}
+                            {% if form.project.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.project.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if not resume %}
+                        <div class="mb-3">
+                            <label for="{{ form.resume.id_for_label }}" class="form-label">简历</label>
+                            {{ form.resume }}
+                            {% if form.resume.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.resume.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">状态</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.status.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.submission_date.id_for_label }}" class="form-label">投递日期</label>
+                            {{ form.submission_date }}
+                            {% if form.submission_date.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.submission_date.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">备注</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.notes.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">选填，添加投递的相关信息</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            {% if from_project %}
+                            <a href="{% url 'project_detail' project.id %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> 返回项目
+                            </a>
+                            {% elif from_resume %}
+                            <a href="{% url 'resume_detail' resume.id %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> 返回简历
+                            </a>
+                            {% else %}
+                            <a href="{% url 'submission_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> 返回投递列表
+                            </a>
+                            {% endif %}
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> 保存
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(function() {
+    // 初始化日期选择器
+    $('#{{ form.submission_date.id_for_label }}').datepicker({
+      format: 'yyyy-mm-dd',
+      autoclose: true,
+      todayHighlight: true,
+      language: 'zh-CN'
+    });
+  });
+</script>
+{% endblock %} 

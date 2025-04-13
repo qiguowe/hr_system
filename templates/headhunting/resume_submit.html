@@ -1,0 +1,104 @@
+{% extends 'base/base.html' %}
+
+{% block title %}投递简历 - 猎头管理系统{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">投递简历</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="card-title mb-0">简历信息</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>姓名：</strong> {{ resume.name }}</p>
+                                    <p><strong>性别：</strong> {{ resume.get_gender_display }}</p>
+                                    <p><strong>工作经验：</strong> {{ resume.experience_years }}年</p>
+                                    <p><strong>当前公司：</strong> {{ resume.current_company|default:"未填写" }}</p>
+                                    <p><strong>当前职位：</strong> {{ resume.current_position|default:"未填写" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="card-title mb-0">项目信息</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>项目名称：</strong> {{ project.title }}</p>
+                                    <p><strong>公司：</strong> {{ project.company.name }}</p>
+                                    <p><strong>职位：</strong> {{ project.job_title }}</p>
+                                    <p><strong>薪资范围：</strong> {{ project.salary_range|default:"未设置" }}</p>
+                                    <p><strong>工作地点：</strong> {{ project.location|default:"未设置" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">投递状态</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.status.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">备注信息</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.notes.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">可以添加关于此次投递的补充说明</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'resume_detail' resume.id %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> 返回简历
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> 确认投递
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<style>
+    .card-body p:last-child {
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %} 

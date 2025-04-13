@@ -1,0 +1,84 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'dashboard' %}">猎头管理系统</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            {% if user.is_authenticated %}
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/accounts/dashboard/' %}active{% endif %}" href="{% url 'dashboard' %}">用户仪表盘</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/headhunting/dashboard/' %}active{% endif %}" href="{% url 'hr_dashboard' %}">猎头仪表盘</a>
+                </li>
+                
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if '/headhunting/resumes/' in request.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        简历管理
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'resume_list' %}">简历列表</a></li>
+                        <li><a class="dropdown-item" href="{% url 'resume_create' %}">创建简历</a></li>
+                        <li><a class="dropdown-item" href="{% url 'tag_list' %}">标签管理</a></li>
+                    </ul>
+                </li>
+                
+                {% if user.is_system_admin or user.is_admin %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if '/headhunting/companies/' in request.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        公司管理
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'company_list' %}">公司列表</a></li>
+                        <li><a class="dropdown-item" href="{% url 'company_create' %}">创建公司</a></li>
+                    </ul>
+                </li>
+                
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if '/headhunting/projects/' in request.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        项目管理
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'project_list' %}">项目列表</a></li>
+                        <li><a class="dropdown-item" href="{% url 'project_create' %}">创建项目</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if 'status' in request.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        状态管理
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'project_status_list' %}">项目状态</a></li>
+                        <li><a class="dropdown-item" href="{% url 'resume_status_list' %}">简历状态</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+                
+                {% if user.is_system_admin %}
+                <li class="nav-item">
+                    <a class="nav-link {% if '/accounts/users/' in request.path %}active{% endif %}" href="{% url 'user_list' %}">用户管理</a>
+                </li>
+                {% endif %}
+            </ul>
+            
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ user.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="{% url 'profile' %}">个人资料</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">退出登录</a></li>
+                    </ul>
+                </li>
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</nav> 

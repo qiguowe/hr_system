@@ -1,0 +1,298 @@
+{% extends 'base/base.html' %}
+
+{% block title %}猎头管理仪表板{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">猎头管理仪表板</h1>
+    
+    <!-- 统计卡片 -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">对接公司</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ companies_count }}</h2>
+                    <p class="card-text">已创建对接公司数量</p>
+                    <a href="{% url 'company_list' %}" class="btn btn-light btn-sm">查看详情</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">招聘项目</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ projects_count }}</h2>
+                    <p class="card-text">已创建招聘项目数量</p>
+                    <a href="{% url 'project_list' %}" class="btn btn-light btn-sm">查看详情</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">人才简历</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ resumes_count }}</h2>
+                    <p class="card-text">已收录人才简历数量</p>
+                    <a href="{% url 'resume_list' %}" class="btn btn-light btn-sm">查看详情</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">收藏简历</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ bookmarks_count }}</h2>
+                    <p class="card-text">已收藏的简历数量</p>
+                    <a href="{% url 'resume_bookmark_list' %}" class="btn btn-light btn-sm">查看收藏</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 统计图表 -->
+    <div class="row">
+        <!-- 项目状态统计 -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">项目状态统计</h5>
+                </div>
+                <div class="card-body">
+                    {% if project_status_stats %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>状态</th>
+                                    <th>数量</th>
+                                    <th>占比</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in project_status_stats %}
+                                <tr>
+                                    <td>{{ stat.status__name|default:"未设置" }}</td>
+                                    <td>{{ stat.count }}</td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: {% widthratio stat.count projects_count 100 %}%;" 
+                                                 aria-valuenow="{{ stat.count }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="{{ projects_count }}">
+                                                {% widthratio stat.count projects_count 100 %}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">暂无项目状态数据</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 简历状态统计 -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">简历状态统计</h5>
+                </div>
+                <div class="card-body">
+                    {% if resume_status_stats %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>状态</th>
+                                    <th>数量</th>
+                                    <th>占比</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in resume_status_stats %}
+                                <tr>
+                                    <td>{{ stat.status__name|default:"未设置" }}</td>
+                                    <td>{{ stat.count }}</td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-info" role="progressbar" 
+                                                 style="width: {% widthratio stat.count resume_status_total 100 %}%;" 
+                                                 aria-valuenow="{{ stat.count }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="{{ resume_status_total }}">
+                                                {% widthratio stat.count resume_status_total 100 %}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">暂无简历状态数据</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 回款统计 -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">回款统计</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 text-center">
+                            <h3>总回款金额</h3>
+                            <h2 class="text-success">¥ {{ total_payment|floatformat:2 }}</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <p>项目平均回款: ¥ <span id="avg-payment">{% if projects_count > 0 %}{{ total_payment|floatformat:2 }}{% else %}0.00{% endif %}</span></p>
+                            <a href="{% url 'project_list' %}" class="btn btn-outline-primary">查看项目回款详情</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近活动 -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">最近活动</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_activities %}
+                    <div class="timeline">
+                        {% for activity in recent_activities %}
+                        <div class="timeline-item">
+                            <div class="timeline-item-marker">
+                                {% if activity.type == 'company' %}
+                                <i class="bi bi-building text-primary"></i>
+                                {% elif activity.type == 'project' %}
+                                <i class="bi bi-briefcase text-success"></i>
+                                {% elif activity.type == 'resume' %}
+                                <i class="bi bi-person-vcard text-info"></i>
+                                {% elif activity.type == 'submission' %}
+                                <i class="bi bi-send text-warning"></i>
+                                {% elif activity.type == 'payment' %}
+                                <i class="bi bi-cash-coin text-danger"></i>
+                                {% endif %}
+                            </div>
+                            <div class="timeline-item-content">
+                                <p class="mb-1">
+                                    <strong>{{ activity.action }}:</strong> 
+                                    <a href="{{ activity.url }}">
+                                        {% if activity.type == 'submission' %}
+                                            {{ activity.object.resume.name }} 投递到 {{ activity.object.project.title }}
+                                        {% elif activity.type == 'payment' %}
+                                            {{ activity.object.project.title }} 回款 {{ activity.object.amount }}元
+                                        {% else %}
+                                            {{ activity.object }}
+                                        {% endif %}
+                                    </a>
+                                </p>
+                                <small class="text-muted">{{ activity.time|date:"Y-m-d H:i" }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">暂无活动记录</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<style>
+    .card-title {
+        margin-bottom: 0;
+    }
+    .progress {
+        height: 20px;
+    }
+    
+    /* 时间线样式 */
+    .timeline {
+        position: relative;
+        padding: 10px 0;
+    }
+    
+    .timeline:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 20px;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 50px;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .timeline-item-marker {
+        position: absolute;
+        left: 10px;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        border-radius: 50%;
+        background-color: #fff;
+        border: 2px solid #e9ecef;
+        z-index: 1;
+    }
+    
+    .timeline-item-marker i {
+        font-size: 12px;
+    }
+    
+    .timeline-item-content {
+        padding: 10px 15px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 计算项目平均回款
+        const totalPayment = parseFloat("{{ total_payment|default:0 }}");
+        const projectsCount = parseInt("{{ projects_count|default:0 }}");
+        if (projectsCount > 0) {
+            const avgPayment = totalPayment / projectsCount;
+            document.getElementById('avg-payment').textContent = avgPayment.toFixed(2);
+        }
+    });
+</script>
+{% endblock %} 

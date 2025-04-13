@@ -1,0 +1,94 @@
+{% extends 'base/base.html' %}
+
+{% block title %}回款记录管理 - {{ project.title }} - 猎头管理系统{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>项目回款记录 - {{ project.title }}</h2>
+        <a href="{% url 'payment_create' project.id %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> 添加回款记录
+        </a>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="card-title mb-0">项目信息</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>项目名称：</strong>{{ project.title }}</p>
+                    <p><strong>公司：</strong>{{ project.company.name }}</p>
+                    <p><strong>职位：</strong>{{ project.job_title }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>项目状态：</strong>{{ project.status.name }}</p>
+                    <p><strong>创建时间：</strong>{{ project.created_at|date:"Y-m-d H:i" }}</p>
+                    <p><strong>创建人：</strong>{{ project.created_by }}</p>
+                </div>
+            </div>
+            <div class="mt-2">
+                <a href="{% url 'project_detail' project.id %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回项目详情
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">回款记录 (总计：¥ {{ total_amount|floatformat:2 }})</h5>
+        </div>
+        <div class="card-body">
+            {% if payments %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>回款日期</th>
+                            <th>金额</th>
+                            <th>付款方式</th>
+                            <th>说明</th>
+                            <th>创建时间</th>
+                            <th>创建人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td>{{ payment.payment_date|date:"Y-m-d" }}</td>
+                            <td class="text-end">¥ {{ payment.amount|floatformat:2 }}</td>
+                            <td>{{ payment.payment_method|default:"-" }}</td>
+                            <td>{{ payment.description|default:"-"|truncatechars:30 }}</td>
+                            <td>{{ payment.created_at|date:"Y-m-d H:i" }}</td>
+                            <td>{{ payment.created_by }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'payment_update' payment.id %}" class="btn btn-outline-primary">
+                                        <i class="bi bi-pencil-fill"></i> 编辑
+                                    </a>
+                                    <a href="{% url 'payment_delete' payment.id %}" class="btn btn-outline-danger">
+                                        <i class="bi bi-trash-fill"></i> 删除
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> 暂无回款记录数据，请点击"添加回款记录"按钮创建。
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock %} 

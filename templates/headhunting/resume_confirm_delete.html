@@ -1,0 +1,62 @@
+{% extends 'base/base.html' %}
+
+{% block title %}删除简历 - 猎头管理系统{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">确认删除简历</h5>
+                </div>
+                <div class="card-body">
+                    <p class="lead">您确定要删除 <strong>{{ resume.name }}</strong> 的简历吗？</p>
+                    
+                    <div class="alert alert-info mb-3">
+                        <p><strong>简历信息：</strong></p>
+                        <ul class="mb-0">
+                            <li>性别：{{ resume.get_gender_display }}</li>
+                            <li>学历：{{ resume.get_education_display }}</li>
+                            <li>工作年限：{{ resume.experience_years }}年</li>
+                            <li>当前公司：{{ resume.current_company|default:"未填写" }}</li>
+                        </ul>
+                    </div>
+                    
+                    {% if resume.project_submissions.count > 0 %}
+                    <div class="alert alert-danger">
+                        <h6><i class="bi bi-exclamation-triangle-fill me-2"></i>警告</h6>
+                        <p>该简历已投递到 <strong>{{ resume.project_submissions.count }}</strong> 个项目，删除简历将同时删除这些投递记录：</p>
+                        <ul>
+                            {% for submission in resume.project_submissions.all %}
+                            <li>{{ submission.project.title }} ({{ submission.status.name }})</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <p class="text-muted">删除后无法恢复，请确认操作。</p>
+                    
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'resume_detail' resume.id %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> 取消
+                            </a>
+                            <form method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> 确认删除
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock %} 

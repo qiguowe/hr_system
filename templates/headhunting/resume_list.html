@@ -1,0 +1,110 @@
+{% extends 'base/base.html' %}
+
+{% block title %}简历管理 - 猎头管理系统{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>简历管理</h2>
+        <a href="{% url 'resume_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> 新建简历
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="get" class="mb-4">
+                <div class="row">
+                    <div class="col-md-8 mb-2 mb-md-0">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="搜索姓名、电话、邮箱、公司..." value="{{ request.GET.q|default:'' }}">
+                            <button class="btn btn-outline-secondary" type="submit">搜索</button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="tag" class="form-select" onchange="this.form.submit()">
+                            <option value="">-- 标签筛选 --</option>
+                            {% for tag in tags %}
+                            <option value="{{ tag.id }}" {% if request.GET.tag == tag.id|stringformat:"i" %}selected{% endif %} style="background-color: {{ tag.color }}; color: white;">
+                                {{ tag.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            {% if resumes %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>学历</th>
+                            <th>工作经验</th>
+                            <th>标签</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for resume in resumes %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'resume_detail' resume.id %}">{{ resume.name }}</a>
+                            </td>
+                            <td>{{ resume.get_gender_display }}</td>
+                            <td>{{ resume.get_education_display }}</td>
+                            <td>{{ resume.experience_years }}年</td>
+                            <td>
+                                {% for tag in resume.tags.all %}
+                                <span class="badge" style="background-color: {{ tag.color }};">{{ tag.name }}</span>
+                                {% endfor %}
+                            </td>
+                            <td>{{ resume.created_at|date:"Y-m-d" }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'resume_detail' resume.id %}" class="btn btn-outline-info">
+                                        <i class="bi bi-eye-fill"></i> 查看
+                                    </a>
+                                    <a href="{% url 'resume_update' resume.id %}" class="btn btn-outline-primary">
+                                        <i class="bi bi-pencil-fill"></i> 编辑
+                                    </a>
+                                    <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-send-fill"></i> 投递
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        {% for project in projects %}
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'resume_submit' resume.id project.id %}">
+                                                {{ project.title }} ({{ project.company.name }})
+                                            </a>
+                                        </li>
+                                        {% empty %}
+                                        <li><span class="dropdown-item disabled">暂无可投递项目</span></li>
+                                        {% endfor %}
+                                    </ul>
+                                    <a href="{% url 'resume_delete' resume.id %}" class="btn btn-outline-danger">
+                                        <i class="bi bi-trash-fill"></i> 删除
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> 暂无简历数据，请点击"新建简历"按钮创建。
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+{% endblock %} 

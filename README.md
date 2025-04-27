@@ -82,7 +82,7 @@
 1. **克隆代码仓库**
 
 ```bash
-git clone <仓库地址>
+git clone https://github.com/qiguowe/hr_system.git
 cd hr_system
 ```
 

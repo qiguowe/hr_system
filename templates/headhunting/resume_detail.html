@@ -1,4 +1,7 @@
 {% extends 'base/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load headhunting_extras %}
 
 {% block title %}{{ resume.name }} - 简历详情 - 猎头管理系统{% endblock %}
 
@@ -133,23 +136,28 @@
                         </div>
                     </div>
                     
-                    {% if resume.resume_file %}
-                    <div class="mb-4">
-                        <div class="fw-bold text-muted mb-2">简历附件</div>
-                        <div class="p-3 bg-light rounded">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-file-earmark-text fs-3 me-2"></i>
-                                <div>
-                                    <div>{{ resume.resume_file.name|slice:"14:" }}</div>
-                                    <small class="text-muted">上传于 {{ resume.updated_at|date:"Y-m-d H:i" }}</small>
+                    <!-- 在简历详情页面添加文件操作按钮 -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">简历附件</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if resume.resume_file %}
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'resume_download' resume.pk %}" class="btn btn-primary">
+                                        <i class="bi bi-download"></i> 下载简历
+                                    </a>
+                                    {% if resume.resume_file.name|lower|endswith:'.pdf' %}
+                                        <a href="{% url 'resume_preview' resume.pk %}" class="btn btn-info" target="_blank">
+                                            <i class="bi bi-eye"></i> 在线预览
+                                        </a>
+                                    {% endif %}
                                 </div>
-                                <a href="{{ resume.resume_file.url }}" class="btn btn-outline-primary ms-auto" download>
-                                    <i class="bi bi-download"></i> 下载
-                                </a>
-                            </div>
+                            {% else %}
+                                <p class="text-muted mb-0">暂无附件</p>
+                            {% endif %}
                         </div>
                     </div>
-                    {% endif %}
                     
                     <div class="mb-4">
                         <div class="fw-bold text-muted mb-2">技能</div>

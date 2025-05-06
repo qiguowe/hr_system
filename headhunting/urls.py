@@ -31,6 +31,8 @@ urlpatterns = [
     path('resumes/<int:pk>/add-tag/', views.resume_add_tag, name='resume_add_tag'),
     path('resumes/<int:pk>/bookmark/', views.resume_bookmark_toggle, name='resume_bookmark_toggle'),
     path('bookmarks/', views.resume_bookmark_list, name='resume_bookmark_list'),
+    path('resumes/<int:pk>/download/', views.resume_download, name='resume_download'),
+    path('resumes/<int:pk>/preview/', views.resume_preview, name='resume_preview'),
     
     # 简历投递
     path('resumes/<int:resume_id>/submit/<int:project_id>/', views.resume_submit, name='resume_submit'),

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponseForbidden, JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse, FileResponse, HttpResponse
 from django.db.models import Q, Count, Sum
 from .models import (
     Company, Project, Resume, ResumeProject, 
@@ -14,6 +14,13 @@ from .forms import (
 )
 from accounts.decorators import admin_required, system_admin_required
 from django.urls import reverse
+from .utils import ResumeParser
+import os
+import tempfile
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import time
+import mimetypes
 
 # Create your views here.
 
@@ -227,15 +234,76 @@ def resume_create(request):
         if form.is_valid():
             resume = form.save(commit=False)
             resume.created_by = request.user
+            
+            # 检查是否有暂存的文件
+            temp_file_path = request.session.get('temp_resume_file')
+            if temp_file_path and os.path.exists(temp_file_path):
+                with open(temp_file_path, 'rb') as f:
+                    resume.resume_file.save(
+                        request.session.get('temp_resume_filename', 'resume.pdf'),
+                        ContentFile(f.read()),
+                        save=False
+                    )
+                # 删除临时文件
+                os.remove(temp_file_path)
+                # 清除session中的临时文件信息
+                del request.session['temp_resume_file']
+                del request.session['temp_resume_filename']
+            
             resume.save()
-            # 保存多对多关系
-            form.save_m2m()
-            messages.success(request, '简历创建成功')
-            return redirect('resume_list')
+            form.save_m2m()  # 保存多对多关系
+            messages.success(request, '简历创建成功！')
+            return redirect('resume_detail', pk=resume.pk)
     else:
         form = ResumeForm()
     
-    return render(request, 'headhunting/resume_form.html', {'form': form, 'title': '创建简历'})
+    # 处理文件解析
+    if request.method == 'POST' and 'parse_file' in request.POST and request.FILES.get('resume_file'):
+        try:
+            parser = ResumeParser()
+            file = request.FILES['resume_file']
+            
+            # 保存文件到临时目录
+            temp_dir = tempfile.gettempdir()
+            temp_file_path = os.path.join(temp_dir, f'resume_{request.user.id}_{int(time.time())}')
+            with open(temp_file_path, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+            
+            # 将临时文件路径保存到session
+            request.session['temp_resume_file'] = temp_file_path
+            request.session['temp_resume_filename'] = file.name
+            
+            # 解析文件
+            parsed_data = parser.parse_file(file)
+            
+            # 创建新的表单实例，预填充解析的数据
+            form = ResumeForm(initial={
+                'name': parsed_data.get('name', ''),
+                'gender': parsed_data.get('gender', ''),
+                'age': parsed_data.get('age', ''),
+                'phone': parsed_data.get('phone', ''),
+                'email': parsed_data.get('email', ''),
+                'education': '\n'.join(parsed_data.get('education', [])),
+                'work_experience': '\n'.join(parsed_data.get('work_experience', [])),
+                'skills': '\n'.join(parsed_data.get('skills', [])),
+            })
+            
+            messages.success(request, '文件解析成功！请检查并完善信息。')
+        except Exception as e:
+            messages.error(request, f'文件解析失败：{str(e)}')
+            # 如果解析失败，删除临时文件
+            if 'temp_resume_file' in request.session:
+                temp_file_path = request.session['temp_resume_file']
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
+                del request.session['temp_resume_file']
+                del request.session['temp_resume_filename']
+    
+    return render(request, 'headhunting/resume_form.html', {
+        'form': form,
+        'title': '创建简历'
+    })
 
 @login_required
 def resume_detail(request, pk):
@@ -872,3 +940,65 @@ def hr_dashboard(request):
     }
     
     return render(request, 'headhunting/dashboard.html', context)
+
+@login_required
+def resume_download(request, pk):
+    """下载简历文件"""
+    resume = get_object_or_404(Resume, pk=pk)
+    
+    # 检查权限
+    if not request.user.is_system_admin and not request.user.is_admin and resume.created_by != request.user:
+        return HttpResponseForbidden('您没有权限下载此简历')
+    
+    if resume.resume_file:
+        file_path = resume.resume_file.path
+        if os.path.exists(file_path):
+            # 获取文件类型
+            content_type, _ = mimetypes.guess_type(file_path)
+            if not content_type:
+                content_type = 'application/octet-stream'
+            
+            # 打开文件
+            file = open(file_path, 'rb')
+            response = FileResponse(file, content_type=content_type)
+            
+            # 设置文件名
+            filename = os.path.basename(file_path)
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            return response
+    
+    messages.error(request, '文件不存在')
+    return redirect('resume_detail', pk=pk)
+
+@login_required
+def resume_preview(request, pk):
+    """在线预览简历文件"""
+    resume = get_object_or_404(Resume, pk=pk)
+    
+    # 检查权限
+    if not request.user.is_system_admin and not request.user.is_admin and resume.created_by != request.user:
+        return HttpResponseForbidden('您没有权限预览此简历')
+    
+    if resume.resume_file:
+        file_path = resume.resume_file.path
+        if os.path.exists(file_path):
+            # 获取文件类型
+            content_type, _ = mimetypes.guess_type(file_path)
+            if not content_type:
+                content_type = 'application/octet-stream'
+            
+            # 对于PDF文件，直接返回
+            if content_type == 'application/pdf':
+                file = open(file_path, 'rb')
+                response = FileResponse(file, content_type=content_type)
+                response['Content-Disposition'] = 'inline'
+                return response
+            
+            # 对于Word文件，返回提示信息
+            elif content_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']:
+                messages.warning(request, 'Word文件暂不支持在线预览，请下载后查看')
+                return redirect('resume_detail', pk=pk)
+    
+    messages.error(request, '文件不存在')
+    return redirect('resume_detail', pk=pk)

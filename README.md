@@ -2,6 +2,139 @@
 
 猎头管理系统是一个基于Django开发的综合性人才招聘管理平台，专为猎头公司设计，提供公司管理、项目跟踪、简历收集、人才推荐和回款统计等核心功能。本系统帮助猎头顾问高效管理招聘流程，提升工作效率。
 
+## 功能特点
+
+- **公司管理**：管理客户公司信息，包括基本信息、联系人等
+- **项目管理**：跟踪招聘项目进度，管理职位需求
+- **简历管理**：
+  - 支持PDF和Word格式简历上传
+  - 自动解析简历信息
+  - 简历分类和标签管理
+  - 简历收藏功能
+- **人才推荐**：
+  - 简历投递管理
+  - 面试流程跟踪
+  - 候选人状态更新
+- **回款管理**：
+  - 回款记录管理
+  - 试用期跟踪
+  - 回款统计
+- **数据统计**：
+  - 项目状态统计
+  - 简历状态统计
+  - 回款金额统计
+  - 最近活动记录
+
+## 技术栈
+
+- **后端**：Django 4.2
+- **前端**：
+  - Bootstrap 5
+  - jQuery
+  - Select2
+  - Animate.css
+- **数据库**：SQLite（可配置为其他数据库）
+- **其他**：
+  - django-crispy-forms
+  - crispy-bootstrap5
+  - python-docx
+  - PyPDF2
+  - spaCy（中文NLP）
+
+## 安装说明
+
+1. 克隆仓库：
+```bash
+git clone https://github.com/qiguowe/hr_system.git
+cd hr_system
+```
+
+2. 创建虚拟环境：
+```bash
+python3 -m venv venv
+source venv/bin/activate  # Linux/Mac
+# 或
+venv\Scripts\activate  # Windows
+```
+
+3. 安装依赖：
+```bash
+pip install -r requirements.txt
+```
+
+4. 安装中文语言模型：
+```bash
+python -m spacy download zh_core_web_sm
+```
+
+5. 初始化数据库：
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+6. 创建超级用户：
+```bash
+python manage.py createsuperuser
+```
+
+7. 运行开发服务器：
+```bash
+python manage.py runserver
+```
+
+## 测试账号
+
+- 邮箱：qgw1@outlook.com
+- 密码：admin123
+
+## 使用说明
+
+1. 访问系统：http://localhost:8000
+2. 使用测试账号登录系统
+3. 开始使用各项功能：
+   - 创建和管理公司信息
+   - 创建招聘项目
+   - 上传和解析简历
+   - 管理简历投递
+   - 跟踪回款记录
+
+## 开发说明
+
+1. 代码规范：
+   - 遵循PEP 8规范
+   - 使用4个空格缩进
+   - 类名使用驼峰命名
+   - 函数和变量使用下划线命名
+
+2. 提交规范：
+   - feat: 新功能
+   - fix: 修复bug
+   - docs: 文档更新
+   - style: 代码格式调整
+   - refactor: 代码重构
+   - test: 测试用例
+   - chore: 其他修改
+
+## 许可证
+
+本项目采用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
+
+## 贡献指南
+
+1. Fork 本仓库
+2. 创建特性分支：`git checkout -b feature/your-feature`
+3. 提交更改：`git commit -m 'feat: add some feature'`
+4. 推送到分支：`git push origin feature/your-feature`
+5. 提交 Pull Request
+
+## 联系方式
+
+如有问题或建议，请通过以下方式联系：
+
+- 邮箱：qgw1@outlook.com
+- GitHub Issues：[提交问题](https://github.com/qiguowe/hr_system/issues)
+
 ## 功能概览
 
 ### 核心功能
@@ -60,170 +193,6 @@
    - 拥有系统的最高权限
    - 可以管理用户账户
    - 可以管理系统配置
-
-## 技术栈
-
-- **后端框架**: Django 5.2
-- **数据库**: SQLite (可扩展到MySQL/PostgreSQL)
-- **前端框架**: Bootstrap 5
-- **前端组件**: Bootstrap Icons, Animate.css
-- **编程语言**: Python 3.12, JavaScript, HTML5, CSS3
-
-## 安装指南
-
-### 环境要求
-
-- Python 3.12+
-- pip (Python包管理工具)
-- virtualenv (推荐)
-
-### 安装步骤
-
-1. **克隆代码仓库**
-
-```bash
-git clone https://github.com/qiguowe/hr_system.git
-cd hr_system
-```
-
-2. **创建并激活虚拟环境**
-
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# 或
-venv\Scripts\activate  # Windows
-```
-
-3. **安装依赖包**
-
-```bash
-pip install -r requirements.txt
-```
-
-4. **初始化数据库**
-
-```bash
-python manage.py migrate
-```
-
-5. **创建超级管理员**
-
-```bash
-python manage.py createsuperuser
-```
-
-6. **启动开发服务器**
-
-```bash
-python manage.py runserver
-```
-
-7. **访问系统**
-
-打开浏览器，访问 http://127.0.0.1:8000/ 即可使用系统。
-
-## 使用指南
-
-### 快速开始
-
-1. **登录系统**
-   - 使用创建的管理员账户登录系统
-   - 首次登录会进入仪表板页面
-
-2. **创建公司**
-   - 导航到"公司管理"
-   - 点击"创建公司"按钮
-   - 填写公司基本信息并保存
-
-3. **创建项目**
-   - 导航到"项目管理"
-   - 点击"创建项目"按钮
-   - 选择关联公司，填写项目信息
-   - 设置项目状态、截止日期等
-
-4. **添加简历**
-   - 导航到"简历管理"
-   - 点击"创建简历"按钮
-   - 填写候选人信息、教育背景、工作经历等
-   - 可以上传简历附件，添加技能标签
-
-5. **投递简历**
-   - 在简历详情页，点击"投递到项目"按钮
-   - 选择目标项目并确认投递
-   - 设置初始投递状态和备注
-
-6. **跟踪投递状态**
-   - 在项目详情页可以查看所有投递记录
-   - 点击"更新状态"可以更改投递状态
-   - 添加状态变更备注记录沟通和进展
-
-7. **记录回款**
-   - 在项目详情页点击"回款管理"
-   - 添加回款记录，包括金额、日期、付款方式等
-
-### 功能详解
-
-#### 公司管理
-
-公司是招聘项目的甲方，系统记录与公司相关的所有信息：
-
-- **基本信息**: 公司名称、地址、联系人等
-- **关联项目**: 该公司发布的所有招聘项目
-- **联系方式**: 联系人、电话、邮箱等
-
-#### 项目管理
-
-项目是猎头工作的核心，包含以下信息：
-
-- **基本信息**: 项目标题、关联公司、职位名称
-- **职位详情**: 职位描述、要求、薪资范围、工作地点
-- **项目状态**: 活跃、暂停、完成等
-- **投递情况**: 所有投递到该项目的简历及状态
-- **回款记录**: 项目产生的所有回款信息
-
-#### 简历管理
-
-简历是候选人信息的载体，包含以下内容：
-
-- **基本信息**: 姓名、性别、出生日期、联系方式
-- **教育背景**: 最高学历、毕业院校、专业
-- **工作情况**: 工作年限、当前公司、当前职位
-- **工作经历**: 详细的工作经历记录，最多支持3段
-- **技能标签**: 用标签标记候选人的技能和特点
-- **简历附件**: 上传候选人原始简历文件
-
-#### 投递管理
-
-投递记录了简历与项目的关联：
-
-- **投递信息**: 简历信息、项目信息、投递时间
-- **状态跟踪**: 当前投递状态及历史变更
-- **备注记录**: 每次状态更新的备注，记录沟通过程
-
-#### 回款管理
-
-回款记录项目产生的收益：
-
-- **回款详情**: 金额、日期、付款方式
-- **回款统计**: 项目总回款、平均回款等
-- **备注说明**: 回款相关的特殊说明
-
-#### 标签系统
-
-标签用于分类和筛选简历：
-
-- **创建标签**: 自定义标签名称和颜色
-- **应用标签**: 为简历添加多个标签
-- **标签筛选**: 根据标签快速找到相关简历
-
-#### 状态管理
-
-系统支持自定义项目状态和简历投递状态：
-
-- **项目状态**: 默认包括活跃、暂停、完成等
-- **投递状态**: 默认包括已提交、审核中、面试中、已发offer、已拒绝等
-- **状态定制**: 管理员可以添加、编辑和删除状态
 
 ## 数据模型
 
@@ -345,27 +314,6 @@ hr_system/
 
 4. **Q: 如何添加新的状态选项?**  
    A: 登录系统管理员账户，进入状态管理页面进行添加
-
-## 贡献指南
-
-欢迎贡献代码或提出改进建议：
-
-1. Fork 项目仓库
-2. 创建功能分支: `git checkout -b feature/amazing-feature`
-3. 提交变更: `git commit -m 'Add some amazing feature'`
-4. 推送到分支: `git push origin feature/amazing-feature`
-5. 提交Pull Request
-
-## 许可证
-
-本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
-
-## 联系方式
-
-如有问题或建议，请联系：
-
-- 邮箱：[your-email@example.com](mailto:your-email@example.com)
-- 项目主页：[GitHub项目主页](https://github.com/yourusername/hr_system)
 
 ## 致谢
 

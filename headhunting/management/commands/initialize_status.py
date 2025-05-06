@@ -27,8 +27,10 @@ class Command(BaseCommand):
             {'name': '审核中', 'code': 'reviewing', 'order': 2, 'description': '简历正在审核中'},
             {'name': '面试中', 'code': 'interview', 'order': 3, 'description': '候选人正在面试中'},
             {'name': '已录用', 'code': 'offer', 'order': 4, 'description': '候选人已录用'},
-            {'name': '已拒绝', 'code': 'rejected', 'order': 5, 'description': '候选人已被拒绝'},
-            {'name': '已取消', 'code': 'cancelled', 'order': 6, 'description': '投递已被取消'}
+            {'name': '试用中', 'code': 'probation', 'order': 5, 'description': '候选人正在试用期'},
+            {'name': '试用通过', 'code': 'probation_passed', 'order': 6, 'description': '候选人试用期已通过'},
+            {'name': '已拒绝', 'code': 'rejected', 'order': 7, 'description': '候选人已被拒绝'},
+            {'name': '已取消', 'code': 'cancelled', 'order': 8, 'description': '投递已被取消'}
         ]
         
         for status_data in resume_statuses:

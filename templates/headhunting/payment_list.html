@@ -1,89 +1,129 @@
 {% extends 'base/base.html' %}
 
-{% block title %}回款记录管理 - {{ project.title }} - 猎头管理系统{% endblock %}
+{% block title %}回款记录 - {{ project.title }} - 猎头管理系统{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>项目回款记录 - {{ project.title }}</h2>
-        <a href="{% url 'payment_create' project.id %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> 添加回款记录
-        </a>
-    </div>
-
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-info text-white">
-            <h5 class="card-title mb-0">项目信息</h5>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>项目名称：</strong>{{ project.title }}</p>
-                    <p><strong>公司：</strong>{{ project.company.name }}</p>
-                    <p><strong>职位：</strong>{{ project.job_title }}</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong>项目状态：</strong>{{ project.status.name }}</p>
-                    <p><strong>创建时间：</strong>{{ project.created_at|date:"Y-m-d H:i" }}</p>
-                    <p><strong>创建人：</strong>{{ project.created_by }}</p>
-                </div>
-            </div>
-            <div class="mt-2">
-                <a href="{% url 'project_detail' project.id %}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> 返回项目详情
-                </a>
-            </div>
+        <h2 class="animate__animated animate__fadeInLeft">回款记录</h2>
+        <div class="animate__animated animate__fadeInRight">
+            <a href="{% url 'payment_create' project.id %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> 添加回款记录
+            </a>
+            <a href="{% url 'project_detail' project.id %}" class="btn btn-outline-secondary ms-2">
+                <i class="bi bi-arrow-left"></i> 返回项目详情
+            </a>
         </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-success text-white">
-            <h5 class="card-title mb-0">回款记录 (总计：¥ {{ total_amount|floatformat:2 }})</h5>
+    <div class="row">
+        <div class="col-md-8">
+            <!-- 回款记录列表 -->
+            <div class="card shadow-sm mb-4 animate__animated animate__fadeInUp">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">回款记录列表</h5>
+                </div>
+                <div class="card-body">
+                    {% if payments %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>回款日期</th>
+                                    <th>金额</th>
+                                    <th>付款方式</th>
+                                    <th>说明</th>
+                                    <th>创建人</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td>{{ payment.payment_date|date:"Y-m-d" }}</td>
+                                    <td>¥{{ payment.amount }}</td>
+                                    <td>{{ payment.payment_method|default:"-" }}</td>
+                                    <td>{{ payment.description|default:"-" }}</td>
+                                    <td>{{ payment.created_by }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'payment_update' payment.id %}" class="btn btn-outline-primary">
+                                                <i class="bi bi-pencil-fill"></i> 编辑
+                                            </a>
+                                            <a href="{% url 'payment_delete' payment.id %}" class="btn btn-outline-danger">
+                                                <i class="bi bi-trash-fill"></i> 删除
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="1" class="text-end"><strong>总计：</strong></td>
+                                    <td colspan="5"><strong>¥{{ total_amount }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <p class="text-muted mb-0">暂无回款记录</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            {% if payments %}
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>回款日期</th>
-                            <th>金额</th>
-                            <th>付款方式</th>
-                            <th>说明</th>
-                            <th>创建时间</th>
-                            <th>创建人</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for payment in payments %}
-                        <tr>
-                            <td>{{ payment.payment_date|date:"Y-m-d" }}</td>
-                            <td class="text-end">¥ {{ payment.amount|floatformat:2 }}</td>
-                            <td>{{ payment.payment_method|default:"-" }}</td>
-                            <td>{{ payment.description|default:"-"|truncatechars:30 }}</td>
-                            <td>{{ payment.created_at|date:"Y-m-d H:i" }}</td>
-                            <td>{{ payment.created_by }}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm">
-                                    <a href="{% url 'payment_update' payment.id %}" class="btn btn-outline-primary">
-                                        <i class="bi bi-pencil-fill"></i> 编辑
-                                    </a>
-                                    <a href="{% url 'payment_delete' payment.id %}" class="btn btn-outline-danger">
-                                        <i class="bi bi-trash-fill"></i> 删除
-                                    </a>
+        
+        <div class="col-md-4">
+            <!-- 试用通过简历 -->
+            {% if probation_passed_count > 0 %}
+            <div class="card shadow-sm mb-4 animate__animated animate__fadeInRight">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">试用通过简历</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill"></i> 有 {{ probation_passed_count }} 份简历已通过试用期，请及时处理回款。
+                    </div>
+                    <div class="list-group">
+                        {% for submission in project.resume_submissions.all %}
+                            {% if submission.status.code == 'probation_passed' %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">
+                                        <a href="{% url 'resume_detail' submission.resume.id %}">{{ submission.resume.name }}</a>
+                                    </h6>
+                                    <small>{{ submission.updated_at|date:"Y-m-d" }}</small>
                                 </div>
-                            </td>
-                        </tr>
+                                <p class="mb-1">职位：{{ submission.resume.current_position }}</p>
+                            </div>
+                            {% endif %}
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> 暂无回款记录数据，请点击"添加回款记录"按钮创建。
+                    </div>
+                </div>
             </div>
             {% endif %}
+            
+            <!-- 项目信息 -->
+            <div class="card shadow-sm animate__animated animate__fadeIn animate__delay-1s">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">项目信息</h5>
+                </div>
+                <div class="card-body">
+                    <h6>{{ project.title }}</h6>
+                    <p class="text-muted mb-2">{{ project.company.name }}</p>
+                    <p class="mb-2">
+                        <span class="badge {% if project.status.code == 'active' %}bg-success{% elif project.status.code == 'paused' %}bg-warning{% elif project.status.code == 'completed' %}bg-primary{% else %}bg-secondary{% endif %}">
+                            {{ project.status.name }}
+                        </span>
+                    </p>
+                    <div class="small text-muted">
+                        <div>创建时间：{{ project.created_at|date:"Y-m-d H:i" }}</div>
+                        <div>创建人：{{ project.created_by }}</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -91,4 +131,5 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 {% endblock %} 

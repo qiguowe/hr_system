@@ -701,10 +701,18 @@ def payment_list(request, project_id):
     # 计算总金额
     total_amount = payments.aggregate(total=Sum('amount'))['total'] or 0
     
+    # 获取试用通过的简历数量
+    probation_passed_count = project.resume_submissions.filter(status__code='probation_passed').count()
+    
+    # 检查是否需要提醒回款
+    if probation_passed_count > 0:
+        messages.info(request, f'有 {probation_passed_count} 份简历已通过试用期，请及时处理回款')
+    
     return render(request, 'headhunting/payment_list.html', {
         'project': project,
         'payments': payments,
-        'total_amount': total_amount
+        'total_amount': total_amount,
+        'probation_passed_count': probation_passed_count
     })
 
 @admin_required
@@ -722,6 +730,12 @@ def payment_create(request, project_id):
             payment = form.save(commit=False)
             payment.project = project
             payment.created_by = request.user
+            
+            # 检查是否有试用通过的简历
+            probation_passed_submissions = project.resume_submissions.filter(status__code='probation_passed')
+            if probation_passed_submissions.exists():
+                messages.success(request, f'发现 {probation_passed_submissions.count()} 份试用通过的简历，已自动关联')
+            
             payment.save()
             messages.success(request, '回款记录添加成功')
             return redirect('payment_list', project_id=project.id)
